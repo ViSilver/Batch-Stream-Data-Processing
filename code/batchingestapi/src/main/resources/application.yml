@@ -1,0 +1,15 @@
+spring:
+  profiles:
+    active: @spring.profiles.active@
+  data:
+    cassandra:
+#      keyspace-name: ${KEYSPACE}
+      keyspace-name: @spring.profiles.active@_air_bnb
+      contact-points: ${CASSANDRA_SEEDS}
+      port: 9042
+      schema-action: CREATE_IF_NOT_EXISTS
+
+csv:
+  file:
+    directory: ${CSV_FILE_DIRECTORY}
+    path: ${CSV_FILE}

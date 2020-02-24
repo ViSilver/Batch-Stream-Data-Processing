@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <springProfile name="default">
+        <property name="HOME_LOG" value="${STREAMING_LOG_DIRECTORY}/clientstreamingestapp.log"/>
+        <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${HOME_LOG}</file>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${STREAMING_LOG_DIRECTORY}/${name}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <!-- each archived file, size max 10MB -->
+                <maxFileSize>10MB</maxFileSize>
+                <!-- total size of all archive files, if total size > 20GB,
+                    it will delete old archived file -->
+                <totalSizeCap>20GB</totalSizeCap>
+                <!-- 60 days to keep -->
+                <maxHistory>60</maxHistory>
+            </rollingPolicy>
+
+            <encoder>
+                <pattern>%d %p %c{1.} [%t] %m%n</pattern>
+            </encoder>
+        </appender>
+
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%ex{full}%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="info">
+            <appender-ref ref="STDOUT" />
+            <appender-ref ref="FILE-ROLLING"/>
+        </root>
+
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.quartz" level="ERROR"/>
+        <logger name="com.zaxxer.hikari" level="ERROR"/>
+        <logger name="fi.aalto.dbp.assignmenttwo" level="debug">
+            <appender-ref ref="FILE-ROLLING"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="client_1">
+        <property name="HOME_LOG" value="${STREAMING_LOG_DIRECTORY}/clientstreamingestapp.log"/>
+        <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${HOME_LOG}</file>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${STREAMING_LOG_DIRECTORY}/${spring.profiles.active}-${project.build.finalName}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <!-- each archived file, size max 10MB -->
+                <maxFileSize>10MB</maxFileSize>
+                <!-- total size of all archive files, if total size > 20GB,
+                    it will delete old archived file -->
+                <totalSizeCap>20GB</totalSizeCap>
+                <!-- 60 days to keep -->
+                <maxHistory>60</maxHistory>
+            </rollingPolicy>
+
+            <encoder>
+                <pattern>%d %p %c{1.} [%t] %m%n</pattern>
+            </encoder>
+        </appender>
+
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%ex{full}%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="info">
+            <appender-ref ref="STDOUT" />
+            <appender-ref ref="FILE-ROLLING"/>
+        </root>
+
+        <logger name="org.springframework" level="INFO"/>
+        <logger name="org.quartz" level="ERROR"/>
+        <logger name="com.zaxxer.hikari" level="ERROR"/>
+        <logger name="fi.aalto.bdp.assignmenttwo" level="debug">
+            <appender-ref ref="FILE-ROLLING"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="prod">
+        <property name="HOME_LOG" value="${LOG_DIRECTORY}/${name}.log"/>
+        <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${HOME_LOG}</file>
+
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${STREAMING_LOG_DIRECTORY}/${spring.profiles.active}-${name}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <!-- each archived file, size max 10MB -->
+                <maxFileSize>10MB</maxFileSize>
+                <!-- total size of all archive files, if total size > 20GB,
+                    it will delete old archived file -->
+                <totalSizeCap>20GB</totalSizeCap>
+                <!-- 60 days to keep -->
+                <maxHistory>60</maxHistory>
+            </rollingPolicy>
+
+            <encoder>
+                <pattern>%d %p %c{1.} [%t] %m%n</pattern>
+            </encoder>
+        </appender>
+        <root level="info">
+            <appender-ref ref="FILE-ROLLING"/>
+        </root>
+
+        <logger name="org.springframework" level="ERROR"/>
+        <logger name="org.quartz" level="ERROR"/>
+        <logger name="fi.aalto.bdp.assignmenttwo" level="debug">
+            <appender-ref ref="FILE-ROLLING"/>
+        </logger>
+    </springProfile>
+</configuration>

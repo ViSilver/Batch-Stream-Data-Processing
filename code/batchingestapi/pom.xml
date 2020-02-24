@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.2.0.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>fi.aalto.bdp.assignmenttwo</groupId>
+    <artifactId>batch-ingest-api</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>batch-ingest-api</name>
+    <packaging>jar</packaging>
+
+    <properties>
+        <spring.version>5.1.9.RELEASE</spring.version>
+        <logback.version>1.1.3</logback.version>
+        <lombok.version>1.18.10</lombok.version>
+        <slf4j.version>1.7.28</slf4j.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-cassandra</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+
+        <!-- CSV parsing -->
+        <dependency>
+            <groupId>com.univocity</groupId>
+            <artifactId>univocity-parsers</artifactId>
+            <version>2.8.3</version>
+        </dependency>
+
+        <!-- utilities -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- logging -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <!-- testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>client_1</id>
+            <properties>
+                <spring.profiles.active>client_1</spring.profiles.active>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <finalName>${spring.profiles.active}_${project.build.finalName}</finalName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>client_2</id>
+            <properties>
+                <spring.profiles.active>client_2</spring.profiles.active>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <finalName>${spring.profiles.active}_${project.build.finalName}</finalName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+<!--                <configuration>-->
+<!--                    <classifier>exec</classifier>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <configuration>-->
+<!--                            <skip>true</skip>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>9</source>
+                    <target>9</target>
+                </configuration>
+            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>com.spotify</groupId>-->
+<!--                <artifactId>dockerfile-maven-plugin</artifactId>-->
+<!--                <version>1.4.9</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>default</id>-->
+<!--                        <goals>-->
+<!--                            <goal>build</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <repository>docker.io/visilver/${project.name}</repository>-->
+<!--                    &lt;!&ndash;					<tag>${project.version}</tag>&ndash;&gt;-->
+<!--                    <buildArgs>-->
+<!--                        <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>-->
+<!--                    </buildArgs>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
+        </plugins>
+    </build>
+</project>

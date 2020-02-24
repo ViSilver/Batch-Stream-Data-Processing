@@ -1,0 +1,109 @@
+version: '3.7'
+
+# 3 node cluster
+# If you see exit code 137 (OOM killer) then ensure Docker has access to more resources
+services:
+  cassandra-seed:
+    container_name: cassandra-seed-node
+    image: cassandra:3.11.0
+    ports:
+      - 9042:9042   # Native transport
+      - 7199:7199   # JMX
+      - 9160:9160   # Thrift clients
+
+  cassandra-node-1:
+    container_name: cassandra-node-1
+    image: cassandra:3.11.0
+    ports:
+      - 9142:9042
+    volumes:
+      - ./:/tmp
+      - ./waiting/:/tmp/waiting/
+    entrypoint: ["/tmp/waiting/wait-for-it.sh", "cassandra-seed-node:9042", "--timeout=0", "--strict", "--", "/docker-entrypoint.sh", "cassandra", "-f"]
+    environment:
+      - CASSANDRA_SEEDS=cassandra-seed-node
+    depends_on:
+      - cassandra-seed
+
+  # you cannot have multiple nodes join the cluster at the same time when
+  # cassandra.consistent.rangemovement is true so we further delay it to give it time to stabilize
+  cassandra-node-2:
+    container_name: cassandra-node-2
+    image: cassandra:3.11.0
+    ports:
+      - 9242:9042
+    volumes:
+      - ./:/tmp
+      - ./waiting/:/tmp/waiting/
+    entrypoint: ["/tmp/waiting/wait-for-it.sh", "cassandra-node-1:9042", "--timeout=0", "--strict", "--", "/docker-entrypoint.sh", "cassandra", "-f"]
+    environment:
+      - CASSANDRA_SEEDS=cassandra-seed-node
+    depends_on:
+      - cassandra-seed
+      - cassandra-node-1
+
+  ingest-manager:
+    container_name: ingest-manager
+    image: visilver/ingest-manager:latest
+    ports:
+      - 5000:5000
+    volumes:
+      - ./batch-client-apps/:/tmp/batch-client-apps/
+      - ./streaming-client-apps/:/tmp/streaming-client-apps/
+      - ./fetchdata/output/:/tmp/fetchdata/output
+      - ./log/streaming-logs/:/tmp/logs/streaming/
+      - ./log/batch-logs/:/tmp/logs/batch/
+      - ./ingest-manager/tmp/:/tmp
+      - ./waiting/:/tmp/waiting/
+    entrypoint: ["/tmp/waiting/wait-for-it.sh", "cassandra-node-2:9042", "--timeout=0", "--strict", "--", "python", "./ingest_manager.py"]
+    environment:
+      - CSV_FILE=/tmp/data/data.csv
+      - CSV_FILE_DIRECTORY=/tmp/fetchdata/output
+      - KEYSPACE=air_bnb
+      - CASSANDRA_SEEDS=cassandra-seed-node
+      - BATCH_CLIENT_APPS_DIRECTORY=/tmp/batch-client-apps/
+      - STREAMING_CLIENT_APPS_DIRECTORY=/tmp/streaming-client-apps/
+      - STREAMING_LOG_DIRECTORY=/tmp/logs/streaming/
+      - BATCH_LOG_DIRECTORY=/tmp/logs/batch/
+      - FETCHDATA_LOG_DIRECTORY=/tmp/logs/fetchdata/
+      - FLASK_APP=ingest_manager.py
+      - FLASK_ENV=development
+      - MAX_WORKERS=3
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BROKER_HOST=rabbitmq
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+      - MIN_RATE=100
+    depends_on:
+      - cassandra-seed
+      - cassandra-node-1
+      - cassandra-node-2
+      - rabbitmq
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    hostname: my-rabbit
+    ports:
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.config
+
+  fetch-data:
+    container_name: fetch-data
+    image: visilver/fetch-data:latest
+    volumes:
+      - ./fetchdata/data/:/tmp/data/
+      - ./fetchdata/output/:/tmp/output/
+      - ./log/fetchdata-logs/:/tmp/logs/fetchdata/
+    env_file:
+      .env
+    environment:
+      - JOB_INTERVAL=5
+      - INPUT_DIRECTORY=/tmp/data/
+      - OUTPUT_DIRECTORY=/tmp/output/
+      - LOG_DIRECTORY=/tmp/logs/fetchdata/
+      - ${MAX_FILE_SIZE}
+      - ${MAX_NR_OF_FILES_PER_USER}

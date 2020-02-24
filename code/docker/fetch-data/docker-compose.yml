@@ -1,0 +1,20 @@
+version: '3.7'
+
+
+services:
+  fetch-data:
+    container_name: fetch-data
+    image: visilver/fetch-data:latest
+    volumes:
+      - ../data/:/tmp/data/
+      - ../output/:/tmp/output/
+      - ../log/:/tmp/logs/
+    env_file:
+      .env
+    environment:
+      - JOB_INTERVAL=5
+      - INPUT_DIRECTORY=/tmp/data/
+      - OUTPUT_DIRECTORY=/tmp/output/
+      - LOG_DIRECTORY=/tmp/logs/
+      - ${MAX_FILE_SIZE}
+      - ${MAX_NR_OF_FILES_PER_USER}

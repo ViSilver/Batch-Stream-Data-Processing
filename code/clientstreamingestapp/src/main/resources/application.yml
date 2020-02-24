@@ -1,0 +1,46 @@
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+  hystrix:
+    enabled: false
+
+spring:
+  profiles:
+    active: @spring.profiles.active@
+  data:
+    cassandra:
+      keyspace-name: @spring.profiles.active@_air_bnb
+      contact-points: ${CASSANDRA_SEEDS:127.0.0.1}
+      port: 9042
+      schema-action: CREATE_IF_NOT_EXISTS
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always      # Always create the Quartz database on startup
+  datasource:
+    jdbc-url: jdbc:h2:mem:spring-quartz;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+data:
+  broker:
+    host: ${BROKER_HOST:127.0.0.1}
+    port: ${BROKER_PORT:5672}
+    queue-name: @spring.profiles.active@
+
+client-stream-ingest:
+  quartz:
+    jobInterval: ${JOB_INTERVAL:10}                 # In seconds
+
+using:
+  spring:
+    schedulerFactory: true
+
+stream-ingest-manager:
+  url: http://localhost:5000
+

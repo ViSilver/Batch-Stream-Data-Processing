@@ -1,0 +1,20 @@
+version: '3.7'
+
+
+services:
+  batch-ingest:
+    container_name: batch-ingest-api
+    image: visilver/batch-ingest-api:latest
+    volumes:
+      - ../output/:/tmp/output/
+      - ../log/:/tmp/logs/
+    env_file:
+      .env
+    environment:
+      - CSV_FILE=data.csv
+      - JOB_INTERVAL=5
+      - INPUT_DIRECTORY=/tmp/data/
+      - OUTPUT_DIRECTORY=/tmp/output/
+      - LOG_DIRECTORY=/tmp/logs/
+      - ${MAX_FILE_SIZE}
+      - ${MAX_NR_OF_FILES_PER_USER}

@@ -1,0 +1,22 @@
+using:
+  spring:
+    schedulerFactory: true
+
+spring:
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always      # Always create the Quartz database on startup
+  datasource:
+    jdbc-url: jdbc:h2:mem:spring-quartz;DB_CLOSE_ON_EXIT=FALSE
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+fetch-data:
+  quartz:
+    jobInterval: ${JOB_INTERVAL:10}                 # In seconds
+  inputDirectory: ${INPUT_DIRECTORY:/src/input/}
+  outputDirectory: ${OUTPUT_DIRECTORY:/src/output/}
+  maxNrOfUserFiles: ${MAX_NR_OF_FILES_PER_USER:4}
+  maxFileSize: ${MAX_FILE_SIZE:20}  # in MB

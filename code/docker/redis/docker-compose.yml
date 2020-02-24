@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  redis:
+    container_name: redis
+    image: redis
+    expose:
+      - 6379
+
