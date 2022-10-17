@@ -19,7 +19,7 @@
 
     <properties>
         <spring-cloud.version>Hoxton.RC1</spring-cloud.version>
-        <c3p0.version>0.9.5.3</c3p0.version>
+        <c3p0.version>0.9.5.4</c3p0.version>
         <quartz.version>2.3.2</quartz.version>
     </properties>
 
