@@ -1,4 +1,4 @@
-Flask==1.1.1
+Flask==2.2.5
 redis==4.4.4
 Injector==0.17.0
 Flask-Injector==0.12.0
